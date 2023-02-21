@@ -1,3 +1,4 @@
+import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/sprite.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +14,7 @@ import '../bullets/bullet.dart';
 /// with health of 1 which means that it will be destroyed on impact since it
 /// is also the lowest health you can have.
 ///
-class PlayerSpaceShip extends SpaceShip {
+class PlayerSpaceShip extends SpaceShip with CollisionCallbacks {
   static const double defaultSpeed = 300.00;
   static final Vector2 defaultSize = Vector2.all(2.00);
   // color of the bullet
@@ -66,6 +67,7 @@ class PlayerSpaceShip extends SpaceShip {
     );
 
     add(component1);
+    add(RectangleHitbox());
 
     position = Vector2(gameRef.size.x / 2, gameRef.size.y - 200);
     debugPrint('player position: $position');
@@ -108,8 +110,13 @@ class PlayerSpaceShip extends SpaceShip {
     print("SimpleSpaceShip onDestroy called");
   }
 
-// @override
-// void onHit(Collidable other) {
-//   print("SimpleSpaceShip onHit called");
-// }
+  @override
+  void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
+    super.onCollision(intersectionPoints, other);
+    if (other is ScreenHitbox) {
+      print("hit ScreenHitbox");
+    } else if (other is SpaceShip) {
+      print("hit SpaceShip");
+    }
+  }
 }

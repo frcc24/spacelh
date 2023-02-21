@@ -12,11 +12,11 @@ void main() async {
   runApp(GameWidget(game: MyGame()));
 }
 
-class MyGame extends FlameGame with HasDraggables, HasTappables /*, HasCollidables*/ {
+class MyGame extends FlameGame with HasDraggables, HasTappables, HasCollisionDetection {
   @override
 
   /// use this flag to put the project into debug mode which will show hitboxes
-  bool debugMode = false;
+  bool debugMode = true;
 
   /// controller used to coordinate all game actions
   late final Controller controller;

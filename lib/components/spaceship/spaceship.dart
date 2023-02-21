@@ -105,16 +105,11 @@ abstract class SpaceShip extends SpriteAnimationComponent with HasGameRef<MyGame
   void onCreate() {
     anchor = Anchor.center;
     size = Vector2.all(60.0);
-    // addHitbox(HitboxRectangle());
   }
 
 //
 // Called when the bullet is being destroyed.
   void onDestroy();
-
-//
-// Called when the Bullet has been hit. The ‘other’ is what the bullet hit, or was hit by.
-// void onHit(Collidable other);
 
   /// Wrap the posittion getter so that any position that is out side of the
   /// screen gets wrapped around

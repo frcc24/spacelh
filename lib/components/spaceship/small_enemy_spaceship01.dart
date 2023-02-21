@@ -1,7 +1,9 @@
+import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/sprite.dart';
 import 'package:flutter/material.dart';
 import 'package:spacelh/components/spaceship/spaceship.dart';
+import 'package:spacelh/core/command.dart';
 
 import '../../utils/utils.dart';
 import '../bullets/bullet.dart';
@@ -13,7 +15,7 @@ import '../bullets/bullet.dart';
 /// with health of 1 which means that it will be destroyed on impact since it
 /// is also the lowest health you can have.
 ///
-class SmallEnemySpaceShip01 extends SpaceShip {
+class SmallEnemySpaceShip01 extends SpaceShip with CollisionCallbacks {
   static const double defaultSpeed = 100.00;
   static final Vector2 defaultSize = Vector2.all(2.00);
   // color of the bullet
@@ -66,6 +68,7 @@ class SmallEnemySpaceShip01 extends SpaceShip {
 
     velocity = Vector2(0, 200);
 
+    add(RectangleHitbox());
     add(spaceShipComponent);
 
     position = Vector2(gameRef.size.x / 2, gameRef.size.y - gameRef.size.y + 20);
@@ -109,8 +112,16 @@ class SmallEnemySpaceShip01 extends SpaceShip {
     print("SimpleSpaceShip onDestroy called");
   }
 
-// @override
-// void onHit(Collidable other) {
+  @override
+  void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
+    super.onCollision(intersectionPoints, other);
+    if (other is ScreenHitbox) {
+      print("enemy ScreenHitbox");
+    } else if (other is SpaceShip) {
+      PlayerCollisionCommand(other, other).addToController(gameRef.controller);
+      print("enemy hit SpaceShip");
+    }
+  }
 //   print("SimpleSpaceShip onHit called");
 // }
 }

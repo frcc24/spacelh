@@ -6,6 +6,7 @@ import 'package:flame/components.dart';
 import 'package:flame_audio/flame_audio.dart';
 // import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:spacelh/components/spaceship/spaceship.dart';
 // import 'package:spacelh/core/asteroid.dart';
 // import 'package:component_001/bullet.dart';
 import 'package:spacelh/core/controller.dart';
@@ -276,6 +277,7 @@ class BulletCollisionCommand extends Command {
     return true;
   }
 }
+
 //
 // /// Implementation of the [Command] to notify a bullet that it has been hit
 // ///
@@ -466,48 +468,48 @@ class BulletCollisionCommand extends Command {
 //   }
 // }
 //
-// /// Implementation of the [Command] to notify a player that it has been hit
-// ///
-// class PlayerCollisionCommand extends Command {
-//   /// the bullet being operated on
-//   late SpaceShip targetPlayer;
-//   late Collidable collisionObject;
-//
-//   /// deault constructor
-//   PlayerCollisionCommand(SpaceShip player, Collidable other) {
-//     targetPlayer = player;
-//     collisionObject = other;
-//   }
-//
-//   /// work method. We create a bullet based on the Spaceship location and angle
-//   /// We currently hardcode the bullet type but this could be looked up from
-//   /// the speceship.
-//   @override
-//   void execute() {
-//     //
-//     // test if this was already captured
-//     if (_getController().children.contains(targetPlayer)) {
-//       // let the bullet know its being destroyed.
-//       targetPlayer.onDestroy();
-//       FlameAudio.audioCache.play('missile_hit.wav', volume: 0.7);
-//       // render the camera shake effect for a short duration
-//       _getController().gameRef.camera.shake(duration: 0.5, intensity: 5);
-//       // remove the bullet from the game
-//       _getController().remove(targetPlayer);
-//       // generate explosion render
-//       ExplosionOfSpacehipRenderCommand().addToController(_getController());
-//       // remove the life
-//       PlayerRemoveLifeCommand().addToController(_getController());
-//     } else {
-//       // we already dealt with this collision
-//     }
-//   }
-//
-//   @override
-//   String getTitle() {
-//     return "BulletCollisionCommand";
-//   }
-// }
+/// Implementation of the [Command] to notify a player that it has been hit
+///
+class PlayerCollisionCommand extends Command {
+  /// the bullet being operated on
+  late SpaceShip targetPlayer;
+  late Component collisionObject;
+
+  /// deault constructor
+  PlayerCollisionCommand(SpaceShip player, Component other) {
+    targetPlayer = player;
+    collisionObject = other;
+  }
+
+  /// work method. We create a bullet based on the Spaceship location and angle
+  /// We currently hardcode the bullet type but this could be looked up from
+  /// the speceship.
+  @override
+  void execute() {
+    //
+    // test if this was already captured
+    if (_getController().children.contains(targetPlayer)) {
+      // let the bullet know its being destroyed.
+      //targetPlayer.onDestroy();
+      FlameAudio.play('missile_hit.wav', volume: 0.7);
+      // render the camera shake effect for a short duration
+      _getController().gameRef.camera.shake(duration: 0.5, intensity: 5);
+      // remove the bullet from the game
+      _getController().remove(targetPlayer);
+      // generate explosion render
+      // ExplosionOfSpacehipRenderCommand().addToController(_getController());
+      // remove the life
+      //PlayerRemoveLifeCommand().addToController(_getController());
+    } else {
+      // we already dealt with this collision
+    }
+  }
+
+  @override
+  String getTitle() {
+    return "BulletCollisionCommand";
+  }
+}
 //
 // /// Implementation of the [Command] to notify a player that it has been hit
 // ///
