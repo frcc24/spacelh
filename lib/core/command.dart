@@ -11,7 +11,7 @@ import 'package:flutter/foundation.dart';
 import 'package:spacelh/core/controller.dart';
 
 import '../components/bullets/bullet.dart';
-import '../components/spaceship/spaceship.dart';
+import '../components/spaceship/player_spaceship.dart';
 // import 'package:shared_preferences/shared_preferences.dart';
 
 /// Broker is just a simple deletgate to take care of processing lists of

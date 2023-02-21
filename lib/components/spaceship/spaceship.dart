@@ -1,6 +1,6 @@
 import 'package:flame/components.dart';
-import 'package:flame/sprite.dart';
 import 'package:flutter/material.dart';
+import 'package:spacelh/components/spaceship/player_spaceship.dart';
 import 'package:spacelh/main.dart';
 
 import '../../utils/utils.dart';
@@ -28,25 +28,25 @@ abstract class SpaceShip extends SpriteAnimationComponent with HasGameRef<MyGame
   static final defaultSize = Vector2.all(5.0);
 
 // velocity vector for the asteroid.
-  late Vector2 _velocity;
+  late Vector2 velocity;
 
 // speed of the asteroid
-  late double _speed;
+  late double speed;
 
 // health of the asteroid
-  late int? _health;
+  late int? health;
 
 // damage that the asteroid does
-  late int? _damage;
+  late int? damage;
 
 // resolution multiplier
-  late final Vector2 _resolutionMultiplier;
+  late final Vector2 resolutionMultiplier;
 
   /// Pixels/s
-  late final double _maxSpeed = defaultMaxSpeed;
+  late final double maxSpeed = defaultMaxSpeed;
 
   /// current bullet type
-  final BulletEnum _currBulletType = BulletEnum.fastBullet;
+  final BulletEnum currBulletType = BulletEnum.fastBullet;
 
   /// Single pixel at the location of the tip of the spaceship
   /// We use it to quickly calculate the position of the rotated nose of the
@@ -55,17 +55,17 @@ abstract class SpaceShip extends SpriteAnimationComponent with HasGameRef<MyGame
   static final _paint = Paint()..color = Colors.transparent;
 
   /// Muzzle pixel for shooting
-  final RectangleComponent _muzzleComponent = RectangleComponent(size: Vector2(1, 1), paint: _paint);
+  final RectangleComponent muzzleComponent = RectangleComponent(size: Vector2(1, 1), paint: _paint);
 
-  late final JoystickComponent _joystick;
+  late final JoystickComponent joystick;
 
 //
 // default constructor with default values
   SpaceShip(Vector2 resolutionMultiplier, JoystickComponent joystick)
-      : _health = defaultHealth,
-        _damage = defaultDamage,
-        _resolutionMultiplier = resolutionMultiplier,
-        _joystick = joystick,
+      : health = defaultHealth,
+        damage = defaultDamage,
+        resolutionMultiplier = resolutionMultiplier,
+        joystick = joystick,
         super(
           size: defaultSize,
           anchor: Anchor.center,
@@ -74,11 +74,11 @@ abstract class SpaceShip extends SpriteAnimationComponent with HasGameRef<MyGame
 //
 // named constructor
   SpaceShip.fullInit(Vector2 resolutionMultiplier, JoystickComponent joystick, {Vector2? size, double? speed, int? health, int? damage})
-      : _resolutionMultiplier = resolutionMultiplier,
-        _joystick = joystick,
-        _speed = speed ?? defaultSpeed,
-        _health = health ?? defaultHealth,
-        _damage = damage ?? defaultDamage,
+      : resolutionMultiplier = resolutionMultiplier,
+        joystick = joystick,
+        speed = speed ?? defaultSpeed,
+        health = health ?? defaultHealth,
+        damage = damage ?? defaultDamage,
         super(
           size: size,
           anchor: Anchor.center,
@@ -88,11 +88,11 @@ abstract class SpaceShip extends SpriteAnimationComponent with HasGameRef<MyGame
 // getters
 
   BulletEnum get getBulletType {
-    return _currBulletType;
+    return currBulletType;
   }
 
   RectangleComponent get getMuzzleComponent {
-    return _muzzleComponent;
+    return muzzleComponent;
   }
 
 ///////////////////////////////////////////////////////
@@ -122,115 +122,6 @@ abstract class SpaceShip extends SpriteAnimationComponent with HasGameRef<MyGame
   Vector2 getNextPosition() {
     return Utils.wrapPosition(gameRef.size, position);
   }
-}
-
-/// This class creates a fast bullet implementation of the [Bullet] contract and
-/// renders the bullet as a simple green square.
-/// Speed has been defaulted to 150 p/s but can be changed through the
-/// constructor. It is set with a damage of 1 which is the lowest damage and
-/// with health of 1 which means that it will be destroyed on impact since it
-/// is also the lowest health you can have.
-///
-class PlayerSpaceShip extends SpaceShip {
-  static const double defaultSpeed = 300.00;
-  static final Vector2 defaultSize = Vector2.all(2.00);
-  // color of the bullet
-  static final _paint = Paint()..color = Colors.green;
-  final spriteSize = Vector2(64.0, 92.0);
-  late SpriteSheet spriteSheet;
-
-  late final animationleft;
-  late final animationIdle;
-  late final animationright;
-
-  late SpriteAnimationComponent component1;
-
-  PlayerSpaceShip(Vector2 resolutionMultiplier, JoystickComponent joystick)
-      : super.fullInit(resolutionMultiplier, joystick,
-            size: defaultSize, speed: defaultSpeed, health: SpaceShip.defaultHealth, damage: SpaceShip.defaultDamage);
-
-  //
-  // named constructor
-  PlayerSpaceShip.fullInit(Vector2 resolutionMultiplier, JoystickComponent joystick, Vector2? size, double? speed, int? health, int? damage)
-      : super.fullInit(resolutionMultiplier, joystick, size: size, speed: speed, health: health, damage: damage);
-
-  @override
-  Future<void> onLoad() async {
-    super.onLoad();
-    //
-    // we adjust the ship size based on resolution multipier
-    size = Utils.vector2Multiply(size, gameRef.controller.getResoltionMultiplier);
-    size.y = size.x;
-    debugPrint("<SimpleSpaceShip> <onLoad> size: $size, multiplier: ${gameRef.controller.getResoltionMultiplier}");
-    //
-    // ship png comes from Kenny
-    // spriteAnimation = await gameRef.loadSprite('starship.png');
-    //final size = Vector2.all(64.0);
-
-    spriteSheet = SpriteSheet(
-      image: await gameRef.images.load('ship.png'),
-      srcSize: Vector2(16.0, 24.0),
-    );
-
-    animationleft = spriteSheet.createAnimation(row: 0, stepTime: 0.01, from: 0, to: 1);
-    animationIdle = spriteSheet.createAnimation(row: 0, stepTime: 0.01, from: 2, to: 3);
-    animationright = spriteSheet.createAnimation(row: 0, stepTime: 0.01, to: 4, from: 3);
-
-    component1 = SpriteAnimationComponent(
-      animation: animationIdle,
-      //scale: Vector2(0.4, 0.4),
-      //position: Vector2(160, -5),
-      size: spriteSize,
-    );
-
-    add(component1);
-
-    position = gameRef.size / 2;
-    debugPrint('player position: $position');
-    _muzzleComponent.position.x = size.x / 2;
-    _muzzleComponent.position.y = size.y / 10;
-
-    add(_muzzleComponent);
-  }
-
-  @override
-  void update(double dt) {
-    if (!_joystick.delta.isZero()) {
-      getNextPosition().add(_joystick.relativeDelta * _maxSpeed * dt);
-      // angle = (_joystick.delta.screenAngle());
-      component1.animation = animationIdle;
-    }
-
-    if (_joystick.direction == JoystickDirection.right ||
-        _joystick.direction == JoystickDirection.downRight ||
-        _joystick.direction == JoystickDirection.upRight) {
-      print('going right');
-      component1.animation = animationright;
-    } else if (_joystick.direction == JoystickDirection.left ||
-        _joystick.direction == JoystickDirection.downLeft ||
-        _joystick.direction == JoystickDirection.upLeft) {
-      print('going left');
-      component1.animation = animationleft;
-    } else {
-      component1.animation = animationIdle;
-    }
-  }
-
-  @override
-  void onCreate() {
-    super.onCreate();
-    print("SimpleSpaceShip onCreate called");
-  }
-
-  @override
-  void onDestroy() {
-    print("SimpleSpaceShip onDestroy called");
-  }
-
-  // @override
-  // void onHit(Collidable other) {
-  //   print("SimpleSpaceShip onHit called");
-  // }
 }
 
 /// This is a Factory Method Design pattern example implementation for SpaceShips

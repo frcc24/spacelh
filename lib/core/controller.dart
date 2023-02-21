@@ -9,6 +9,7 @@ import 'package:spacelh/core/command.dart';
 // import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spacelh/main.dart';
 
+import '../components/spaceship/player_spaceship.dart';
 import '../components/spaceship/spaceship.dart';
 
 /// The controller is the center piece of the game management.
