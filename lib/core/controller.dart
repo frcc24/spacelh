@@ -143,6 +143,7 @@ class Controller extends Component with HasGameRef<MyGame> {
     final knobPaint = BasicPalette.white.withAlpha(20).paint();
     final backgroundPaint = BasicPalette.transparent.withAlpha(0).paint();
     //
+
     // Actual Joystick component creation
     _joystick = JoystickComponent(
       knob: CircleComponent(radius: 15, paint: knobPaint),
