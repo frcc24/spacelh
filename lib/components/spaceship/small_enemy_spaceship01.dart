@@ -13,8 +13,8 @@ import '../bullets/bullet.dart';
 /// with health of 1 which means that it will be destroyed on impact since it
 /// is also the lowest health you can have.
 ///
-class PlayerSpaceShip extends SpaceShip {
-  static const double defaultSpeed = 300.00;
+class SmallEnemySpaceShip01 extends SpaceShip {
+  static const double defaultSpeed = 100.00;
   static final Vector2 defaultSize = Vector2.all(2.00);
   // color of the bullet
   static final _paint = Paint()..color = Colors.green;
@@ -25,15 +25,15 @@ class PlayerSpaceShip extends SpaceShip {
   late final SpriteAnimation animationIdle;
   late final SpriteAnimation animationright;
 
-  late SpriteAnimationComponent component1;
+  late SpriteAnimationComponent spaceShipComponent;
 
-  PlayerSpaceShip(Vector2 resolutionMultiplier, JoystickComponent joystick)
+  SmallEnemySpaceShip01(Vector2 resolutionMultiplier, JoystickComponent? joystick)
       : super.fullInit(resolutionMultiplier, joystick,
             size: defaultSize, speed: defaultSpeed, health: SpaceShip.defaultHealth, damage: SpaceShip.defaultDamage);
 
   //
   // named constructor
-  PlayerSpaceShip.fullInit(Vector2 resolutionMultiplier, JoystickComponent joystick, Vector2? size, double? speed, int? health, int? damage)
+  SmallEnemySpaceShip01.fullInit(Vector2 resolutionMultiplier, JoystickComponent? joystick, Vector2? size, double? speed, int? health, int? damage)
       : super.fullInit(resolutionMultiplier, joystick, size: size, speed: speed, health: health, damage: damage);
 
   @override
@@ -43,31 +43,32 @@ class PlayerSpaceShip extends SpaceShip {
     // we adjust the ship size based on resolution multipier
     size = Utils.vector2Multiply(size, gameRef.controller.getResoltionMultiplier);
     size.y = size.x;
-    debugPrint("<SimpleSpaceShip> <onLoad> size: $size, multiplier: ${gameRef.controller.getResoltionMultiplier}");
     //
     // ship png comes from Kenny
     // spriteAnimation = await gameRef.loadSprite('starship.png');
     //final size = Vector2.all(64.0);
 
     spriteSheet = SpriteSheet(
-      image: await gameRef.images.load('ship.png'),
-      srcSize: Vector2(16.0, 24.0),
+      image: await gameRef.images.load('sml_en_ship_01.png'),
+      srcSize: Vector2(28.0, 20.0),
     );
 
-    animationLeft = spriteSheet.createAnimation(row: 0, stepTime: 0.01, from: 0, to: 1);
-    animationIdle = spriteSheet.createAnimation(row: 0, stepTime: 0.01, from: 2, to: 3);
-    animationright = spriteSheet.createAnimation(row: 0, stepTime: 0.01, to: 4, from: 3);
+    // animationLeft = spriteSheet.createAnimation(row: 0, stepTime: 0.01, from: 0, to: 1);
+    animationIdle = spriteSheet.createAnimation(row: 0, stepTime: 0.01, from: 0, to: 1);
+    // animationright = spriteSheet.createAnimation(row: 0, stepTime: 0.01, to: 4, from: 3);
 
-    component1 = SpriteAnimationComponent(
+    spaceShipComponent = SpriteAnimationComponent(
       animation: animationIdle,
       //scale: Vector2(0.4, 0.4),
       //position: Vector2(160, -5),
       size: spriteSize,
     );
 
-    add(component1);
+    velocity = Vector2(0, 200);
 
-    position = Vector2(gameRef.size.x / 2, gameRef.size.y - 200);
+    add(spaceShipComponent);
+
+    position = Vector2(gameRef.size.x / 2, gameRef.size.y - gameRef.size.y + 20);
     debugPrint('player position: $position');
     muzzleComponent.position.x = size.x / 2;
     muzzleComponent.position.y = size.y / 10;
@@ -78,23 +79,23 @@ class PlayerSpaceShip extends SpaceShip {
   @override
   void update(double dt) {
     super.update(dt);
-    if (!joystick!.delta.isZero()) {
-      getNextPosition().add(joystick!.relativeDelta * maxSpeed * dt);
-      // angle = (_joystick.delta.screenAngle());
-      component1.animation = animationIdle;
+
+    if (position.y >= gameRef.size.y) {
+      position.y = 0;
+    }
+    // position.add(velocity * dt);
+    if (dt % 2 == 0) {
+      velocity.add(-Utils.generateRandomDirection() * 10);
+    } else {
+      velocity.add(Utils.generateRandomDirection() * 10);
+    }
+    if (position.x <= 0 || position.x >= gameRef.size.x - 50) {
+      velocity.x = -velocity.x;
+    } else if (position.y <= 0 || position.y >= gameRef.size.y) {
+      velocity.y = -velocity.y;
     }
 
-    if (joystick!.direction == JoystickDirection.right ||
-        joystick!.direction == JoystickDirection.downRight ||
-        joystick!.direction == JoystickDirection.upRight) {
-      component1.animation = animationright;
-    } else if (joystick!.direction == JoystickDirection.left ||
-        joystick!.direction == JoystickDirection.downLeft ||
-        joystick!.direction == JoystickDirection.upLeft) {
-      component1.animation = animationLeft;
-    } else {
-      component1.animation = animationIdle;
-    }
+    position.add(velocity * dt);
   }
 
   @override

@@ -10,6 +10,7 @@ import 'package:spacelh/core/command.dart';
 import 'package:spacelh/main.dart';
 
 import '../components/spaceship/player_spaceship.dart';
+import '../components/spaceship/small_enemy_spaceship01.dart';
 import '../components/spaceship/spaceship.dart';
 
 /// The controller is the center piece of the game management.
@@ -198,7 +199,7 @@ class Controller extends Component with HasGameRef<MyGame> {
     // if (isCurrLevelFinished()) {
     //   debugPrint('{controller} <timer hook loading next level>');
     //   // load next level if it exists
-    //   loadNextGameLevel();
+    loadNextGameLevel();
     // }
 
     /// Test for player respawn
@@ -300,6 +301,8 @@ class Controller extends Component with HasGameRef<MyGame> {
     //   _currentGameLevelIndex++;
     //   UpdateScoreboardLevelInfoCommand(getScoreBoard).addToController(this);
     // }
+    SmallEnemySpaceShip01 smallEnemySpaceShip01 = SmallEnemySpaceShip01(Vector2.all(100), null);
+    add(smallEnemySpaceShip01);
   }
 
   void spawnNewPlayer() {
@@ -311,6 +314,9 @@ class Controller extends Component with HasGameRef<MyGame> {
       ..multiplier = getResoltionMultiplier;
     player = SpaceShipFactory.create(context);
     add(player);
+
+    SmallEnemySpaceShip01 smallEnemySpaceShip01 = SmallEnemySpaceShip01(Vector2.all(100), null);
+    add(smallEnemySpaceShip01);
   }
 
   /// check if the current level is done.

@@ -17,7 +17,7 @@ import '../bullets/bullet.dart';
 ///  - add a new enumeration entry
 ///  - add a new switch case to the [SpaceShipFactory] to create this
 ///    new [SpaceShip] instance when the enumeration entry is provided.
-enum SpaceShipEnum { playerSpaceShip }
+enum SpaceShipEnum { playerSpaceShip, enemyShip }
 
 abstract class SpaceShip extends SpriteAnimationComponent with HasGameRef<MyGame> {
 // default values
@@ -57,11 +57,11 @@ abstract class SpaceShip extends SpriteAnimationComponent with HasGameRef<MyGame
   /// Muzzle pixel for shooting
   final RectangleComponent muzzleComponent = RectangleComponent(size: Vector2(1, 1), paint: _paint);
 
-  late final JoystickComponent joystick;
+  late final JoystickComponent? joystick;
 
 //
 // default constructor with default values
-  SpaceShip(Vector2 resolutionMultiplier, JoystickComponent joystick)
+  SpaceShip(Vector2 resolutionMultiplier, JoystickComponent? joystick)
       : health = defaultHealth,
         damage = defaultDamage,
         resolutionMultiplier = resolutionMultiplier,
@@ -73,7 +73,7 @@ abstract class SpaceShip extends SpriteAnimationComponent with HasGameRef<MyGame
 
 //
 // named constructor
-  SpaceShip.fullInit(Vector2 resolutionMultiplier, JoystickComponent joystick, {Vector2? size, double? speed, int? health, int? damage})
+  SpaceShip.fullInit(Vector2 resolutionMultiplier, JoystickComponent? joystick, {Vector2? size, double? speed, int? health, int? damage})
       : resolutionMultiplier = resolutionMultiplier,
         joystick = joystick,
         speed = speed ?? defaultSpeed,
@@ -140,6 +140,15 @@ class SpaceShipFactory {
     /// collect all the Bullet definitions here
     switch (context.spaceShipType) {
       case SpaceShipEnum.playerSpaceShip:
+        {
+          if (context.speed != PlayerBuildContext.defaultSpeed) {
+            result = PlayerSpaceShip.fullInit(context.multiplier, context.joystick, context.size, context.speed, context.health, context.damage);
+          } else {
+            result = PlayerSpaceShip(context.position, context.joystick);
+          }
+        }
+        break;
+      case SpaceShipEnum.enemyShip:
         {
           if (context.speed != PlayerBuildContext.defaultSpeed) {
             result = PlayerSpaceShip.fullInit(context.multiplier, context.joystick, context.size, context.speed, context.health, context.damage);
