@@ -67,7 +67,7 @@ class PlayerSpaceShip extends SpaceShip with CollisionCallbacks {
     );
 
     add(component1);
-    add(RectangleHitbox());
+    add(RectangleHitbox(size: spriteSize * .8));
 
     position = Vector2(gameRef.size.x / 2, gameRef.size.y - 200);
     debugPrint('player position: $position');

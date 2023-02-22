@@ -278,102 +278,104 @@ class BulletCollisionCommand extends Command {
   }
 }
 
-//
-// /// Implementation of the [Command] to notify a bullet that it has been hit
-// ///
-// class AsteroidCollisionCommand extends Command {
-//   /// the bullet being operated on
-//   late Asteroid _targetAsteroid;
-//   late Collidable _collisionObject;
-//   Vector2? _collisionPosition;
-//
-//   /// deault constructor
-//   AsteroidCollisionCommand(Asteroid asteroid, Collidable other) {
-//     _targetAsteroid = asteroid;
-//     _collisionObject = other;
-//     _collisionPosition = _targetAsteroid.position.clone();
-//   }
-//
-//   /// in this work method we check if the asteroid should be split into
-//   /// small asteroids. We also remov this object from the stack and add any
-//   /// new asteroids to the stack
-//   @override
-//   void execute() {
-//     // check if this is still on the stack
-//     if (_getController().currLevelObjectStack.contains(_targetAsteroid)) {
-//       _getController().currLevelObjectStack.remove(_targetAsteroid);
-//
-//       // check if the asteroid is splittable
-//       bool canBeSplit = _targetAsteroid.canBeSplit();
-//       //
-//       // if it can be split then split it by doing the following:
-//       // calculate the velocity of the new asteroids
-//       // then use the factory to create the new asteroids
-//       // and then add them to the stack and the game
-//       //
-//
-//       if (canBeSplit) {
-//         //
-//         // create the smaller colllsion explosion
-//         ExplosionOfSplitAsteroidRenderCommand(_targetAsteroid).addToController(_getController());
-//         //
-//         // calculate the vectors for the new asteroids
-//         //
-//         //
-//
-//         // clone the vector target data so that we have a safe copy
-//         Vector2 asteroidAVelocity = _targetAsteroid.getVelocity.clone();
-//         Vector2 asteroidBVelocity = _targetAsteroid.getVelocity.clone();
-//         // rotate the vector by 45 degrees clockwise and anti-clockwise
-//         asteroidAVelocity.rotate(pi / 4);
-//         asteroidBVelocity.rotate(-pi / 4);
-//
-//         debugPrint("<AsteroidCollisionCommand> <command> asteroid A: velocity angle ${asteroidAVelocity.angleToSigned(Vector2(0, -1))}");
-//         // create the context for the asteroid creation
-//         AsteroidBuildContext contextA = AsteroidBuildContext()
-//           ..asteroidType = _targetAsteroid.getSplitAsteroids()[0]
-//           ..position = _collisionPosition!
-//           ..velocity = asteroidAVelocity
-//           ..multiplier = _getController().getResoltionMultiplier;
-//
-//         AsteroidBuildContext contextB = AsteroidBuildContext()
-//           ..asteroidType = _targetAsteroid.getSplitAsteroids()[1]
-//           ..position = _collisionPosition!
-//           ..velocity = asteroidBVelocity
-//           ..multiplier = _getController().getResoltionMultiplier;
-//         // create the two new asteroids
-//         Asteroid asteroidA = AsteroidFactory.create(contextA);
-//         Asteroid asteroidB = AsteroidFactory.create(contextB);
-//         debugPrint("<AsteroidCollisionCommand> <command> asteroid a ${asteroidA.hashCode}: ${asteroidA.toString()}");
-//         debugPrint("<AsteroidCollisionCommand> <command> asteroid b ${asteroidB.hashCode}: ${asteroidB.toString()}");
-//
-//         //
-//         // add them to the stack and the game
-//         _getController().currLevelObjectStack.addAll([asteroidA, asteroidB]);
-//         _getController().addAll([asteroidA, asteroidB]);
-//       } else {
-//         // since it cannot be split we will generate a larger explosion
-//         //
-//         // create the larger colllsion explosion
-//         ExplosionOfDestroyedAsteroidRenderCommand(_targetAsteroid).addToController(_getController());
-//       }
-//
-//       debugPrint("<AsteroidCollisionCommand> <command> ${_targetAsteroid.hashCode} canBeSplit: $canBeSplit");
-//       // let the asteroid know its being destroyed.
-//       _targetAsteroid.onDestroy();
-//       // remove the target asteroid  from the game
-//       _getController().remove(_targetAsteroid);
-//     } else {
-//       // this is an incorrect collision which we dismiss
-//       return;
-//     }
-//   }
-//
-//   @override
-//   String getTitle() {
-//     return "BulletCollisionCommand";
-//   }
-// }
+/// Implementation of the [Command] to notify a bullet that it has been hit
+///
+class EnemyCollisionCommand extends Command {
+  /// the bullet being operated on
+  late SpaceShip _targetEnemy;
+  late Component _collisionObject;
+  Vector2? _collisionPosition;
+
+  /// deault constructor
+  EnemyCollisionCommand(SpaceShip asteroid, Component other) {
+    _targetEnemy = asteroid;
+    _collisionObject = other;
+    _collisionPosition = _targetEnemy.position.clone();
+  }
+
+  /// in this work method we check if the asteroid should be split into
+  /// small asteroids. We also remov this object from the stack and add any
+  /// new asteroids to the stack
+  @override
+  void execute() {
+    // check if this is still on the stack
+    if (_getController().children.contains(_targetEnemy)) {
+      _getController().children.remove(_targetEnemy);
+      _getController().children.remove(_collisionObject);
+      _getController().spawNewEnemy();
+
+      // check if the asteroid is splittable
+      //bool canBeSplit = _targetEnemy.canBeSplit();
+      //
+      // if it can be split then split it by doing the following:
+      // calculate the velocity of the new asteroids
+      // then use the factory to create the new asteroids
+      // and then add them to the stack and the game
+      //
+
+      // if (canBeSplit) {
+      //   //
+      //   // create the smaller colllsion explosion
+      //   ExplosionOfSplitAsteroidRenderCommand(_targetEnemy).addToController(_getController());
+      //   //
+      //   // calculate the vectors for the new asteroids
+      //   //
+      //   //
+      //
+      //   // clone the vector target data so that we have a safe copy
+      //   Vector2 asteroidAVelocity = _targetEnemy.getVelocity.clone();
+      //   Vector2 asteroidBVelocity = _targetEnemy.getVelocity.clone();
+      //   // rotate the vector by 45 degrees clockwise and anti-clockwise
+      //   asteroidAVelocity.rotate(pi / 4);
+      //   asteroidBVelocity.rotate(-pi / 4);
+      //
+      //   debugPrint("<AsteroidCollisionCommand> <command> asteroid A: velocity angle ${asteroidAVelocity.angleToSigned(Vector2(0, -1))}");
+      //   // create the context for the asteroid creation
+      //   AsteroidBuildContext contextA = AsteroidBuildContext()
+      //     ..asteroidType = _targetEnemy.getSplitAsteroids()[0]
+      //     ..position = _collisionPosition!
+      //     ..velocity = asteroidAVelocity
+      //     ..multiplier = _getController().getResoltionMultiplier;
+      //
+      //   AsteroidBuildContext contextB = AsteroidBuildContext()
+      //     ..asteroidType = _targetEnemy.getSplitAsteroids()[1]
+      //     ..position = _collisionPosition!
+      //     ..velocity = asteroidBVelocity
+      //     ..multiplier = _getController().getResoltionMultiplier;
+      //   // create the two new asteroids
+      //   Asteroid asteroidA = AsteroidFactory.create(contextA);
+      //   Asteroid asteroidB = AsteroidFactory.create(contextB);
+      //   debugPrint("<AsteroidCollisionCommand> <command> asteroid a ${asteroidA.hashCode}: ${asteroidA.toString()}");
+      //   debugPrint("<AsteroidCollisionCommand> <command> asteroid b ${asteroidB.hashCode}: ${asteroidB.toString()}");
+      //
+      //   //
+      //   // add them to the stack and the game
+      //   _getController().currLevelObjectStack.addAll([asteroidA, asteroidB]);
+      //   _getController().addAll([asteroidA, asteroidB]);
+      // } else {
+      //   // since it cannot be split we will generate a larger explosion
+      //   //
+      //   // create the larger colllsion explosion
+      //   ExplosionOfDestroyedAsteroidRenderCommand(_targetEnemy).addToController(_getController());
+      // }
+
+      // debugPrint("<AsteroidCollisionCommand> <command> ${_targetEnemy.hashCode} canBeSplit: $canBeSplit");
+      // let the asteroid know its being destroyed.
+      _targetEnemy.onDestroy();
+      // remove the target asteroid  from the game
+      _getController().remove(_targetEnemy);
+    } else {
+      // this is an incorrect collision which we dismiss
+      return;
+    }
+  }
+
+  @override
+  String getTitle() {
+    return "BulletCollisionCommand";
+  }
+}
+
 //
 // /// Implementation of the [Command] to notify the scoreboard that shots should
 // /// be updated

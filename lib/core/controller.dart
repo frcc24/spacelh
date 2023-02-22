@@ -305,6 +305,11 @@ class Controller extends Component with HasGameRef<MyGame> {
     add(smallEnemySpaceShip01);
   }
 
+  void spawNewEnemy() {
+    SmallEnemySpaceShip01 smallEnemySpaceShip01 = SmallEnemySpaceShip01(Vector2.all(100), null);
+    add(smallEnemySpaceShip01);
+  }
+
   void spawnNewPlayer() {
     //
     // creating the player that will be controlled by our joystick

@@ -16,11 +16,11 @@ import '../bullets/bullet.dart';
 /// is also the lowest health you can have.
 ///
 class SmallEnemySpaceShip01 extends SpaceShip with CollisionCallbacks {
-  static const double defaultSpeed = 100.00;
+  static const double defaultSpeed = 40.00;
   static final Vector2 defaultSize = Vector2.all(2.00);
   // color of the bullet
   static final _paint = Paint()..color = Colors.green;
-  final spriteSize = Vector2(64.0, 92.0);
+  final spriteSize = Vector2(50.0, 50.0);
   late SpriteSheet spriteSheet;
 
   late final SpriteAnimation animationLeft;
@@ -45,6 +45,7 @@ class SmallEnemySpaceShip01 extends SpaceShip with CollisionCallbacks {
     // we adjust the ship size based on resolution multipier
     size = Utils.vector2Multiply(size, gameRef.controller.getResoltionMultiplier);
     size.y = size.x;
+    anchor = Anchor.center;
     //
     // ship png comes from Kenny
     // spriteAnimation = await gameRef.loadSprite('starship.png');
@@ -60,15 +61,14 @@ class SmallEnemySpaceShip01 extends SpaceShip with CollisionCallbacks {
     // animationright = spriteSheet.createAnimation(row: 0, stepTime: 0.01, to: 4, from: 3);
 
     spaceShipComponent = SpriteAnimationComponent(
-      animation: animationIdle,
-      //scale: Vector2(0.4, 0.4),
-      //position: Vector2(160, -5),
-      size: spriteSize,
-    );
+        animation: animationIdle,
+        //scale: Vector2(0.4, 0.4),
+        //position: Vector2(160, -5),
+        size: spriteSize);
 
-    velocity = Vector2(0, 200);
+    velocity = Vector2(0, 70);
 
-    add(RectangleHitbox());
+    add(RectangleHitbox(size: spriteSize));
     add(spaceShipComponent);
 
     position = Vector2(gameRef.size.x / 2, gameRef.size.y - gameRef.size.y + 20);
@@ -86,17 +86,18 @@ class SmallEnemySpaceShip01 extends SpaceShip with CollisionCallbacks {
     if (position.y >= gameRef.size.y) {
       position.y = 0;
     }
-    // position.add(velocity * dt);
+    position.add(velocity * dt);
     if (dt % 2 == 0) {
-      velocity.add(-Utils.generateRandomDirection() * 10);
+      velocity.add(-Utils.generateRandomDirection());
     } else {
       velocity.add(Utils.generateRandomDirection() * 10);
     }
-    if (position.x <= 0 || position.x >= gameRef.size.x - 50) {
+    if (position.x <= 0 || position.x >= gameRef.size.x) {
       velocity.x = -velocity.x;
-    } else if (position.y <= 0 || position.y >= gameRef.size.y) {
-      velocity.y = -velocity.y;
     }
+    // else if (position.y <= 0 || position.y >= gameRef.size.y) {
+    //   velocity.y = -velocity.y - 10;
+    // }
 
     position.add(velocity * dt);
   }

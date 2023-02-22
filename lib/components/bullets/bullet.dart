@@ -1,5 +1,7 @@
+import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
+import 'package:spacelh/components/spaceship/small_enemy_spaceship01.dart';
 import 'package:spacelh/utils/utils.dart';
 
 import '../../core/command.dart';
@@ -28,8 +30,8 @@ enum BulletEnum { slowBullet, fastBullet }
 /// You should also overide the abstract methods such as onCreate(),
 /// onDestroy(), and onHit()
 ///
-abstract class Bullet extends PositionComponent with HasGameRef<MyGame> /*, HasHitboxes, Collidable*/ {
-  static const double defaultSpeed = 100.00;
+abstract class Bullet extends PositionComponent with HasGameRef<MyGame>, CollisionCallbacks {
+  static const double defaultSpeed = 25.00;
   static const int defaultDamage = 1;
   static const int defaultHealth = 1;
   static final Vector2 defaulSize = Vector2.all(1.0);
@@ -104,8 +106,6 @@ abstract class Bullet extends PositionComponent with HasGameRef<MyGame> /*, HasH
   void onCreate() {
     // to improve accurace of collision detection we make the hitbox
     // about 4 times larger for the bullets.
-    // addHitbox(HitboxRectangle(relation: Vector2(2.0, 2.0)));
-    //addHitbox(HitboxRectangle());
   }
 
   //
@@ -126,6 +126,17 @@ abstract class Bullet extends PositionComponent with HasGameRef<MyGame> /*, HasH
       //FlameAudio.audioCache.play('missile_hit.wav');
     }
   }
+
+  @override
+  void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
+    super.onCollision(intersectionPoints, other);
+    if (other is ScreenHitbox) {
+      print("enemy ScreenHitbox");
+    } else if (other is SmallEnemySpaceShip01) {
+      EnemyCollisionCommand(other, this).addToController(gameRef.controller);
+      print("bullet enemy hit SpaceShip");
+    }
+  }
 }
 
 /// This class creates a fast bullet implementation of the [Bullet] contract and
@@ -136,7 +147,7 @@ abstract class Bullet extends PositionComponent with HasGameRef<MyGame> /*, HasH
 /// is also the lowest health you can have.
 ///
 class FastBullet extends Bullet {
-  static const double defaultSpeed = 500.00;
+  static const double defaultSpeed = 70.00;
   static final Vector2 defaultSize = Vector2.all(5.00);
   // color of the bullet
   static final _paint = Paint()..color = Colors.green;
@@ -154,15 +165,17 @@ class FastBullet extends Bullet {
     await super.onLoad();
     // _velocity is a unit vector so we need to make it account for the actual
     // speed.
+    add(RectangleHitbox(size: size));
     print("FastBullet onLoad called: speed: $_speed");
     _velocity = (_velocity)..scaleTo(_speed);
+    anchor = Anchor.center;
   }
 
   @override
   void render(Canvas canvas) {
     super.render(canvas);
     canvas.drawRect(size.toRect(), _paint);
-    // renderHitboxes(canvas);
+    //renderHitboxes(canvas);
   }
 
   @override
