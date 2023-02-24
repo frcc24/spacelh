@@ -1,11 +1,15 @@
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
-import 'package:flutter/material.dart';
-import 'package:spacelh/components/spaceship/small_enemy_spaceship01.dart';
+import 'package:flame/sprite.dart';
 import 'package:spacelh/utils/utils.dart';
 
 import '../../core/command.dart';
 import '../../main.dart';
+import '../spaceship/small_enemy_spaceship01.dart';
+import 'bullet_01.dart';
+import 'bullet_02.dart';
+import 'bullet_03.dart';
+import 'bullet_04.dart';
 
 /// Simple enum which will hold enumerated names for all our [Bullet]-derived
 /// child classes
@@ -17,7 +21,7 @@ import '../../main.dart';
 ///  - add a new enumeration entry
 ///  - add a new switch case to the [BulletFactory] to create this new [Bullet]
 ///    instance when the enumeration entry is provided.
-enum BulletEnum { slowBullet, fastBullet }
+enum BulletEnum { bullet04, bullet03, bullet02, bullet01 }
 
 /// Bullet class is a [PositionComponent] so we get the angle and position of the
 /// element.
@@ -30,31 +34,37 @@ enum BulletEnum { slowBullet, fastBullet }
 /// You should also overide the abstract methods such as onCreate(),
 /// onDestroy(), and onHit()
 ///
-abstract class Bullet extends PositionComponent with HasGameRef<MyGame>, CollisionCallbacks {
+abstract class Bullet extends SpriteAnimationComponent with HasGameRef<MyGame>, CollisionCallbacks {
   static const double defaultSpeed = 25.00;
   static const int defaultDamage = 1;
   static const int defaultHealth = 1;
   static final Vector2 defaulSize = Vector2.all(1.0);
 
+  var spriteSize = Vector2(64.0, 64.0);
+  late SpriteSheet spriteSheet;
+
+  late final SpriteAnimation animationBullet;
+  late SpriteAnimationComponent component1;
+
   // velocity vector for the bullet.
-  late Vector2 _velocity;
+  late Vector2 velocity;
 
   // speed of the bullet
-  late double _speed;
+  late double speed;
 
   // health of the bullet
-  late int? _health;
+  late int? health;
 
   // damage that the bullet does
-  late int? _damage;
+  late int? damage;
 
   //
   // default constructor with default values
   Bullet(Vector2 position, Vector2 velocity)
-      : _velocity = velocity.normalized(),
-        _speed = defaultSpeed,
-        _health = defaultHealth,
-        _damage = defaultDamage,
+      : velocity = velocity.normalized(),
+        speed = defaultSpeed,
+        health = defaultHealth,
+        damage = defaultDamage,
         super(
           size: defaulSize,
           position: position,
@@ -64,10 +74,10 @@ abstract class Bullet extends PositionComponent with HasGameRef<MyGame>, Collisi
   //
   // named constructor
   Bullet.fullInit(Vector2 position, Vector2 velocity, {Vector2? size, double? speed, int? health, int? damage})
-      : _velocity = velocity.normalized(),
-        _speed = speed ?? defaultSpeed,
-        _health = health ?? defaultHealth,
-        _damage = damage ?? defaultDamage,
+      : velocity = velocity.normalized(),
+        speed = speed ?? defaultSpeed,
+        health = health ?? defaultHealth,
+        damage = damage ?? defaultDamage,
         super(
           size: size,
           position: position,
@@ -82,11 +92,11 @@ abstract class Bullet extends PositionComponent with HasGameRef<MyGame>, Collisi
   // getters
   //
   int? get getDamage {
-    return _damage;
+    return damage;
   }
 
   int? get getHealth {
-    return _health;
+    return health;
   }
 
   ////////////////////////////////////////////////////////
@@ -139,128 +149,6 @@ abstract class Bullet extends PositionComponent with HasGameRef<MyGame>, Collisi
   }
 }
 
-/// This class creates a fast bullet implementation of the [Bullet] contract and
-/// renders the bullet as a simple green square.
-/// Speed has been defaulted to 150 p/s but can be changed through the
-/// constructor. It is set with a damage of 1 which is the lowest damage and
-/// with health of 1 which means that it will be destroyed on impact since it
-/// is also the lowest health you can have.
-///
-class FastBullet extends Bullet {
-  static const double defaultSpeed = 70.00;
-  static final Vector2 defaultSize = Vector2.all(5.00);
-  // color of the bullet
-  static final _paint = Paint()..color = Colors.green;
-
-  FastBullet(Vector2 position, Vector2 velocity)
-      : super.fullInit(position, velocity, size: defaultSize, speed: defaultSpeed, health: Bullet.defaultHealth, damage: Bullet.defaultDamage);
-
-  //
-  // named constructor
-  FastBullet.fullInit(Vector2 position, Vector2 velocity, Vector2? size, double? speed, int? health, int? damage)
-      : super.fullInit(position, velocity, size: size, speed: speed, health: health, damage: damage);
-
-  @override
-  Future<void> onLoad() async {
-    await super.onLoad();
-    // _velocity is a unit vector so we need to make it account for the actual
-    // speed.
-    add(RectangleHitbox(size: size));
-    print("FastBullet onLoad called: speed: $_speed");
-    _velocity = (_velocity)..scaleTo(_speed);
-    anchor = Anchor.center;
-  }
-
-  @override
-  void render(Canvas canvas) {
-    super.render(canvas);
-    canvas.drawRect(size.toRect(), _paint);
-    //renderHitboxes(canvas);
-  }
-
-  @override
-  void update(double dt) {
-    position.add(_velocity * dt);
-    super.update(dt);
-  }
-
-  @override
-  void onCreate() {
-    super.onCreate();
-    print("FastBullet onCreate called");
-  }
-
-  @override
-  void onDestroy() {
-    print("FastBullet onDestroy called");
-  }
-
-  // @override
-  // void onHit(Collidable other) {
-  //   print("FastBullet onHit called");
-  // }
-}
-
-/// This class creates a slow bullet implementation of the [Bullet] contract and
-/// renders the bullet as a simple red filled-in circle.
-/// Speed has been defaulted to 50 p/s but can be changed through the
-/// constructor. It is set with a damage of 1 which is the lowest damage and
-/// with health of 1 which means that it will be destroyed on impact since it
-/// is also the lowest health you can have.
-///
-class SlowBullet extends Bullet {
-  static const double defaultSpeed = 50.00;
-  static final Vector2 defaultSize = Vector2.all(4.0);
-  // color of the bullet
-  static final _paint = Paint()..color = Colors.red;
-
-  SlowBullet(Vector2 position, Vector2 velocity)
-      : super.fullInit(position, velocity, size: defaultSize, speed: defaultSpeed, health: Bullet.defaultHealth, damage: Bullet.defaultDamage);
-
-  //
-  // named constructor
-  SlowBullet.fullInit(Vector2 position, Vector2 velocity, Vector2? size, double? speed, int? health, int? damage)
-      : super.fullInit(position, velocity, size: size, speed: speed, health: health, damage: damage);
-
-  @override
-  Future<void> onLoad() async {
-    await super.onLoad();
-    // _velocity is a unit vector so we need to make it account for the actual
-    // speed.
-    _velocity = (_velocity)..scaleTo(_speed);
-  }
-
-  @override
-  void render(Canvas canvas) {
-    super.render(canvas);
-    canvas.drawCircle(Offset(size.x / 2, size.y / 2), size.x / 2, _paint);
-    // renderHitboxes(canvas);
-    //canvas.drawCircle(size.toRect(), _paint);
-  }
-
-  @override
-  void update(double dt) {
-    position.add(_velocity * dt);
-    super.update(dt);
-  }
-
-  @override
-  void onCreate() {
-    super.onCreate();
-    print("SlowBullet onCreate called");
-  }
-
-  @override
-  void onDestroy() {
-    print("SlowBullet onDestroy called");
-  }
-
-  // @override
-  // void onHit(Collidable other) {
-  //   print("SlowBullet onHit called");
-  // }
-}
-
 /// This is a Factory Method Design pattern example implementation for Bullets
 /// in our game.
 ///
@@ -276,22 +164,40 @@ class BulletFactory {
 
     /// collect all the Bullet definitions here
     switch (context.bulletType) {
-      case BulletEnum.slowBullet:
+      case BulletEnum.bullet02:
         {
           if (context.speed != BulletBuildContext.defaultSpeed) {
-            result = SlowBullet.fullInit(context.position, context.velocity, context.size, context.speed, context.health, context.damage);
+            result = Bullet02.fullInit(context.position, context.velocity, context.size, context.speed, context.health, context.damage);
           } else {
-            result = SlowBullet(context.position, context.velocity);
+            result = Bullet02(context.position, context.velocity);
           }
         }
         break;
 
-      case BulletEnum.fastBullet:
+      case BulletEnum.bullet01:
         {
           if (context.speed != BulletBuildContext.defaultSpeed) {
-            result = FastBullet.fullInit(context.position, context.velocity, context.size, context.speed, context.health, context.damage);
+            result = Bullet01.fullInit(context.position, context.velocity, context.size, context.speed, context.health, context.damage);
           } else {
-            result = FastBullet(context.position, context.velocity);
+            result = Bullet01(context.position, context.velocity);
+          }
+        }
+        break;
+      case BulletEnum.bullet03:
+        {
+          if (context.speed != BulletBuildContext.defaultSpeed) {
+            result = Bullet03.fullInit(context.position, context.velocity, context.size, context.speed, context.health, context.damage);
+          } else {
+            result = Bullet03(context.position, context.velocity);
+          }
+        }
+        break;
+      case BulletEnum.bullet04:
+        {
+          if (context.speed != BulletBuildContext.defaultSpeed) {
+            result = Bullet04.fullInit(context.position, context.velocity, context.size, context.speed, context.health, context.damage);
+          } else {
+            result = Bullet04(context.position, context.velocity);
           }
         }
         break;

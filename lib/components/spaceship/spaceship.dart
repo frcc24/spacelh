@@ -46,7 +46,7 @@ abstract class SpaceShip extends SpriteAnimationComponent with HasGameRef<MyGame
   late final double maxSpeed = defaultMaxSpeed;
 
   /// current bullet type
-  final BulletEnum currBulletType = BulletEnum.fastBullet;
+  final BulletEnum currBulletType = BulletEnum.bullet01;
 
   /// Single pixel at the location of the tip of the spaceship
   /// We use it to quickly calculate the position of the rotated nose of the

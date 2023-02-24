@@ -16,7 +16,7 @@ class MyGame extends FlameGame with HasDraggables, HasTappables, HasCollisionDet
   @override
 
   /// use this flag to put the project into debug mode which will show hitboxes
-  bool debugMode = true;
+  bool debugMode = false;
 
   /// controller used to coordinate all game actions
   late final Controller controller;
