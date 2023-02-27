@@ -1,5 +1,8 @@
+import 'package:flame/components.dart';
 import 'package:flame/events.dart';
+import 'package:flame/flame.dart';
 import 'package:flame/game.dart';
+import 'package:flame/parallax.dart';
 import 'package:flutter/material.dart';
 
 import 'core/command.dart';
@@ -7,6 +10,7 @@ import 'core/controller.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  Flame.device.fullScreen();
   // await Flame.fullScreen();
   // await Flame.setLandscape();
   runApp(GameWidget(game: MyGame()));
@@ -17,6 +21,14 @@ class MyGame extends FlameGame with HasDraggables, HasTappables, HasCollisionDet
 
   /// use this flag to put the project into debug mode which will show hitboxes
   bool debugMode = false;
+
+  final parallaxImages = [
+    //ParallaxImageData('big_stars.png'),
+    ParallaxImageData('small_stars.png'),
+    ParallaxImageData('stars1.png'),
+    ParallaxImageData('stars2.png'),
+    ParallaxImageData('big_stars.png'),
+  ];
 
   /// controller used to coordinate all game actions
   late final Controller controller;
@@ -35,6 +47,17 @@ class MyGame extends FlameGame with HasDraggables, HasTappables, HasCollisionDet
     /// initialize resources
     ///
     loadResources();
+
+    final parallax = await loadParallaxComponent(
+      parallaxImages,
+
+      repeat: ImageRepeat.repeat,
+      baseVelocity: Vector2(0, -25),
+
+      //layerDelta: Vector2(20, 0),
+      velocityMultiplierDelta: Vector2(1, 1.8),
+    );
+    add(parallax);
 
     /// Add a controller
     ///
